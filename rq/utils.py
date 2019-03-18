@@ -180,4 +180,8 @@ def utcformat(dt):
 
 
 def utcparse(string):
-    return datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%SZ")
+    try:
+        date_obj = datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        date_obj = datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%fZ") 
+    return date_obj
