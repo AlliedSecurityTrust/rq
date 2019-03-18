@@ -9,7 +9,7 @@ from .connections import resolve_connection
 from .exceptions import UnpickleError, NoSuchJobError
 from .utils import import_attribute, utcnow, utcformat, utcparse
 from rq.compat import text_type, decode_redis_hash, as_text
-
+import datetime
 
 def enum(name, *sequential, **named):
     values = dict(zip(sequential, range(len(sequential))), **named)
@@ -351,7 +351,13 @@ class Job(object):
             if date_str is None:
                 return
             else:
-                return utcparse(as_text(date_str))
+                
+                try:
+                    date_obj = utcparse(as_text(date_str))
+                except ValueError:
+                    date_obj = utcparse(as_text(datetime.datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%dT%H:%M:%SZ')))
+                
+                return date_obj
 
         try:
             self.data = obj['data']
