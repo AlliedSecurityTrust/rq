@@ -9,7 +9,7 @@ from .connections import resolve_connection
 from .exceptions import UnpickleError, NoSuchJobError
 from .utils import import_attribute, utcnow, utcformat, utcparse
 from rq.compat import text_type, decode_redis_hash, as_text
-
+import datetime
 
 def enum(name, *sequential, **named):
     values = dict(zip(sequential, range(len(sequential))), **named)
@@ -358,11 +358,11 @@ class Job(object):
         except KeyError:
             raise NoSuchJobError('Unexpected job format: {0}'.format(obj))
 
-        self.created_at = to_date(as_text(obj.get('created_at')))
+        self.created_at = to_date(as_text(datetime.datetime.strptime(obj.get('created_at'), '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%dT%H:%M:%SZ')))
         self.origin = as_text(obj.get('origin'))
         self.description = as_text(obj.get('description'))
-        self.enqueued_at = to_date(as_text(obj.get('enqueued_at')))
-        self.ended_at = to_date(as_text(obj.get('ended_at')))
+        self.enqueued_at = to_date(as_text(datetime.datetime.strptime(obj.get('enqueued_at'), '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%dT%H:%M:%SZ')))
+        self.ended_at = to_date(as_text(datetime.datetime.strptime(obj.get('ended_at'), '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%Y-%m-%dT%H:%M:%SZ')))
         self._result = unpickle(obj.get('result')) if obj.get('result') else None  # noqa
         self.exc_info = obj.get('exc_info')
         self.timeout = int(obj.get('timeout')) if obj.get('timeout') else None
